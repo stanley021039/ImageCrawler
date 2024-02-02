@@ -16,13 +16,20 @@ This project is a simple web application built with Flask that allows users to f
     git clone https://github.com/stanley021039/ImageCrawler.git
     ```
 
-2. Install dependencies:
+2. **Establish Virtual Environment:**
+
+    ```bash
+    python -m venv .venv
+    source .venv/bin/activate
+    ```
+
+3. Install dependencies:
 
     ```bash
     pip install -r requirements.txt
     ```
 
-3. **Setup Apache Environment:**
+4. **Setup Apache Environment:**
     Add the following configuration to your Apache virtual host file:
     ```apache
     <Location "/ImageCrawler">
@@ -37,7 +44,7 @@ This project is a simple web application built with Flask that allows users to f
     sudo service apache2 reload
     ```
 
-4. **Run the application using Gunicorn:**
+5. **Run the application using Gunicorn:**
     ```bash
     gunicorn -c gunicorn_config.py image_crawler_app:app --log-level debug --daemon
     ```
