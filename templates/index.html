@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Viewer</title>
+    <link rel="stylesheet" type="text/css" href="{{ APPLICATION_ROOT }}/static/css/index.css">
+</head>
+<body>
+    <div>
+        <input type="text" id="queryInput" placeholder="Enter query...(ex: cat)">
+        <input type="number" id="amountInput" placeholder="amount(default=20)" min="1" style="width: 150px;">
+        <label for="sourceSelect">Select a source:</label>
+        <select id="sourceSelect">
+            <option value="pixabay">Pixabay</option>
+            <option value="unsplash">Unsplash</option>
+        </select>
+        <button onclick="startFetching()">Fetch Images</button>
+        <button id="resetButton">delete current images</button>
+        <button id="downloadButton">Download all images as ZIP</button>
+    </div>
+    <div id="imageContainer"></div>
+
+    <script>
+        var applicationRoot = "{{ APPLICATION_ROOT }}";
+    </script>
+    <script src="{{ APPLICATION_ROOT }}/static/js/index.js"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+#imageContainer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 10px; /* 图片之间的间隔 */
+}
+
+.imageItem {
+    flex: 1 1 200px; /* 每列最小宽度为200px，允许自动增长 */
+    max-width: 200px; /* 图片容器最大宽度 */
+}
+
+.imageItem img {
+    max-width: 100%; /* 图片最大宽度为容器宽度 */
+    height: auto; /* 图片高度自适应 */
+    display: block; /* 图片设为块级元素 */
+}

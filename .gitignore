@@ -1,0 +1,6 @@
+external_resource/*
+logs/*
+.venv
+__pycache__
+pic/*
+temp/*
