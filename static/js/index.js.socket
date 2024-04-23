@@ -1,9 +1,13 @@
-let eventSource;
+let socket
 let sessionToken = generateSessionToken();
 console.log('current sessionToken:', sessionToken)
 
 var resetButton = document.getElementById('resetButton');
 resetButton.addEventListener('click', function() {
+    if (socket) {
+        socket.close();
+    }
+
     fetch(`${applicationRoot}/api/Sessions?sessionToken=${sessionToken}`, {
         method: 'DELETE',
       })
@@ -17,6 +21,7 @@ resetButton.addEventListener('click', function() {
       .catch(error => {
         console.error('Error occurred while deleting session:', error);
       });
+
     sessionToken = generateSessionToken();
     const imageContainer = document.getElementById('imageContainer');
     imageContainer.innerHTML = '';
@@ -24,14 +29,14 @@ resetButton.addEventListener('click', function() {
 });
 
 function startFetching() {
-    if (eventSource) {
-        eventSource.close();
+    if (socket) {
+        socket.close();
     }
 
     const query = document.getElementById('queryInput').value.trim();
     if (query === '') {
-        if (eventSource) {
-            eventSource.close();
+        if (socket) {
+            socket.close();
         }
         return;
     }
@@ -41,18 +46,20 @@ function startFetching() {
 
     var siteselectElement = document.getElementById("sourceSelect");
     var siteValue = siteselectElement.options[siteselectElement.selectedIndex].value;
+    
+    socket = io('https://www.hd0619-info.site:8001');
 
-    eventSource = new EventSource(`${applicationRoot}/api/Crawler?site=${siteValue}&query=${query}&amount=${amount}&sessionToken=${sessionToken}`);
+    socket.on('image', function(img_name) {
+        loadImageFromBackend(img_name, sessionToken);
+    });
 
-    eventSource.onmessage = function(event) {
-        if (event.data === 'CLOSE') {
-            console.log('EventSource connection closed');
-            eventSource.close();
-        } else {
-            const img_name = event.data;
-            loadImageFromBackend(img_name, sessionToken);
-        }
-    };
+    socket.on('close', function() {
+        console.log('WebSocket connection closed');
+    });
+
+    socket.on('error', function(error) {
+        console.error('WebSocket error:', error);
+    });
 }
 
 function loadImageFromBackend(img_name, sessionToken) {
@@ -80,6 +87,11 @@ function loadImageFromBackend(img_name, sessionToken) {
             console.error('Error loading image');
         };
         img.src = objectURL;
+
+        img.addEventListener('click', function() {
+            deleteImage(img_name, sessionToken);
+        });
+
         link.appendChild(img);
 
         const imageContainer = document.getElementById('imageContainer');
@@ -123,3 +135,23 @@ downloadButton.addEventListener('click', function() {
         console.error('Error downloading images:', error);
     });
 });
+
+function deleteImage(img_name, sessionToken) {
+    fetch(`${applicationRoot}/api/Images?sessionToken=${sessionToken}&img_name=${encodeURIComponent(img_name)}`, {
+        method: 'DELETE',
+    })
+    .then(response => {
+        if (response.ok) {
+            console.log('Image deleted successfully');
+            const imgElement = document.querySelector(`img[src*="${encodeURIComponent(img_name)}"]`);
+            if (imgElement) {
+                imgElement.parentNode.removeChild(imgElement);
+            }
+        } else {
+            console.error('Failed to delete image');
+        }
+    })
+    .catch(error => {
+        console.error('Error occurred while deleting image:', error);
+    });
+}
