@@ -32,18 +32,19 @@ class pixabayCrawler():
         page = 0
         hits = []
         while amount > 0:
-            per_page = min(200, amount)
-            amount -= 200
+            per_page = max(min(200, amount), 3)  # pixabay not allow per_page < 3
             page += 1
             url = f"https://pixabay.com/api/?key={self.api_key}&q={self.query}&per_page={per_page}&page={page}"
             print('request endpoint:', url)
             response = requests.get(url)
             data = response.json()
             if 'hits' in data:
-               hits.extend(data['hits'])
+                print(amount)
+                hits.extend(data['hits'][:amount])
             else:
                 print("Error fetching data from Pixabay")
                 break
+            amount -= 200
         return hits
     
     def trans_md5(self, img_url):
